@@ -19,6 +19,8 @@ import { NavigationActions, StackActions } from 'react-navigation';
 import config from "../configs/config"
 import { NativeViewGestureHandler } from 'react-native-gesture-handler';
 
+import OneSignal from 'react-native-onesignal'; // Import package from node modules
+
 const resetAction = StackActions.reset({
   index:0,
   actions: [NavigationActions.navigate({routeName:"Vattu",params:{item:1}})]
@@ -51,6 +53,36 @@ export default class Login extends Component {
         isLoading: true,
         userinfo: []    //Khai báo listData để chứa dữ liệu
     }
+
+    OneSignal.init("ec4e5f22-8e76-444e-a9ba-ead394b25b40");
+
+    OneSignal.addEventListener('received', this.onReceived);
+    OneSignal.addEventListener('opened', this.onOpened);
+    OneSignal.addEventListener('ids', this.onIds);
+    
+    
+}
+
+componentWillUnmount() {
+  OneSignal.removeEventListener('received', this.onReceived);
+  OneSignal.removeEventListener('opened', this.onOpened);
+  OneSignal.removeEventListener('ids', this.onIds);
+  
+}
+
+onReceived(notification) {
+  console.log("Notification received: ", notification);
+}
+
+onOpened(openResult) {
+  console.log('Message: ', openResult.notification.payload.body);
+  console.log('Data: ', openResult.notification.payload.additionalData);
+  console.log('isActive: ', openResult.notification.isAppInFocus);
+  console.log('openResult: ', openResult);
+}
+
+onIds(device) {
+  console.log('Device info: ', device);
 }
 
     loginevent(){
@@ -70,13 +102,17 @@ export default class Login extends Component {
       .then((response) => response.json())
       .then((responseJson) => {
         //alert(JSON.stringify(responseJson.user[0]["ID"]));
-
+        OneSignal.setSubscription(true);
+        OneSignal.sendTag("tendangnhap", this.state.email);
         //console.error(responseJson.d);
         try{
            AsyncStorage.setItem("userid", JSON.stringify(responseJson.user[0]["ID"]));
            AsyncStorage.setItem("token", JSON.stringify(responseJson.user[0]["TOKEN"]));
            AsyncStorage.setItem("hoten", JSON.stringify(responseJson.user[0]["TEN"]));
+           AsyncStorage.setItem("email", JSON.stringify(this.state.email));
            AsyncStorage.setItem("isLoggedIn1", "true");
+           
+
            this.setState({
             //userinfo: JSON.parse(responseJson.user),
             userid: JSON.stringify(responseJson.user[0]["ID"]),
@@ -116,7 +152,7 @@ export default class Login extends Component {
     //alert(itemid);
     try{
 
-        AsyncStorage.getItem("isLoggedIn1").then(result =>{
+        AsyncStorage.getItem("isLoggedIn1").then(async (result) =>{
           //AsyncStorage.setItem("isLoggedIn1", false);
           //alert(result+ "123");
           //console.log(result);
@@ -130,7 +166,7 @@ export default class Login extends Component {
                 //this.props.navigation.navigate("Login");
             }
         });
-        AsyncStorage.getItem("hoten").then(result =>{
+        AsyncStorage.getItem("hoten").then(async (result) =>{
           this.setState({hoten: result});
           //alert(result+ "123");
           //console.log(result);

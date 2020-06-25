@@ -21,6 +21,7 @@ import Vantay from './screens/Vantay'
 import styles from './configs/style';
 
 
+
 const HomeNavigator = createStackNavigator(
   {
     Login: {
@@ -158,28 +159,40 @@ export default class LoginView extends Component {
     super(props);
     this.state = {
       userid   : '',
+      user_name: '',
       token: '',
       hoten: '',
       isLoggedIn1: false,
       messageshow:false
     }
+
+    
   }
+
+  
 
   componentDidMount() {
     //AsyncStorage.getItem("isLoggedIn").then((value) =>{
     //  this.setState({"isLoggedIn": value});
     //}).done();
-    try{
-      AsyncStorage.getItem("isLoggedIn1").then(result =>{
+   try{
+      AsyncStorage.getItem("isLoggedIn1").then(async (result) =>{
         //AsyncStorage.setItem("isLoggedIn1", false);
         this.setState({isLoggedIn1: result});
         //alert(result+ "123");
         //console.log(result);
       });
-      AsyncStorage.getItem("hoten").then(result =>{
+      AsyncStorage.getItem("hoten").then(async (result) =>{
         this.setState({hoten: result});
         //alert(result+ "123");
         //console.log(result);
+      });
+      AsyncStorage.getItem("user_name").then(async (result) =>{
+        this.setState({user_name: result});
+        
+        //alert(result+ "123");
+        //console.log(result);
+        
       })
       
     } catch(error){ 
@@ -189,6 +202,7 @@ export default class LoginView extends Component {
       this.setState({token: ''});
       this.setState({hoten: ''});
     }
+    
     }
 
     
