@@ -102,8 +102,7 @@ onIds(device) {
       .then((response) => response.json())
       .then((responseJson) => {
         //alert(JSON.stringify(responseJson.user[0]["ID"]));
-        OneSignal.setSubscription(true);
-        OneSignal.sendTag("tendangnhap", this.state.email);
+        
         //console.error(responseJson.d);
         try{
            AsyncStorage.setItem("userid", JSON.stringify(responseJson.user[0]["ID"]));
@@ -112,7 +111,9 @@ onIds(device) {
            AsyncStorage.setItem("email", JSON.stringify(this.state.email));
            AsyncStorage.setItem("isLoggedIn1", "true");
            
-
+           OneSignal.setSubscription(true);
+           OneSignal.sendTag("tendangnhap", this.state.email);
+           
            this.setState({
             //userinfo: JSON.parse(responseJson.user),
             userid: JSON.stringify(responseJson.user[0]["ID"]),

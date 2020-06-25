@@ -19,6 +19,8 @@ import {Tacphamitem} from '../views/Tacphamitem';
 import config from "../configs/config"
 import styles from '../configs/style';
 
+import OneSignal from 'react-native-onesignal'; // Import package from node modules
+
 export default class Vattu extends Component {
 
     //Header ứng dụng (tùy chọn)
@@ -39,6 +41,7 @@ export default class Vattu extends Component {
     this.state = {
         isFetching: false,
         userid   : '',
+        email   : '',
       token: '',
       hoten: '',
         message: "",
@@ -48,7 +51,8 @@ export default class Vattu extends Component {
         listData: []    //Khai báo listData để chứa dữ liệu
     }
     this.arrayholder = [];
-
+    OneSignal.init("ec4e5f22-8e76-444e-a9ba-ead394b25b40");
+    
 }
 
 onRefresh() {
@@ -124,7 +128,7 @@ componentDidMount() {
     //alert(itemid);
     try{
 
-        AsyncStorage.getItem("isLoggedIn1").then(result =>{
+        AsyncStorage.getItem("isLoggedIn1").then(async (result) =>{
           //AsyncStorage.setItem("isLoggedIn1", false);
           //alert(result+ "123");
           //console.log(result);
@@ -144,6 +148,14 @@ componentDidMount() {
                     //console.log(result);
                     }
                 });
+                AsyncStorage.getItem("email").then(async (result) =>{
+                    this.setState({email: result});
+                    OneSignal.setSubscription(true);
+                    //alert(result.replace(/"/g,""));
+                    OneSignal.sendTag("tendangnhap", this.state.email.toString().replace(/"/g,""));
+                    //alert(result+ "123");
+                    //console.log(result);
+                  });
             }
             else 
             {

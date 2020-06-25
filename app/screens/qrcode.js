@@ -26,12 +26,17 @@ export default class SQrCode extends Component {
     };
   }
 
-  componentDidMount(){
-    CameraKitCameraScreen.checkDeviceCameraAuthorizationStatus().then(isCameraAuthorized => {
-      if (!isCameraAuthorized || isCameraAuthorized === -1) {
-           CameraKitCamera.requestDeviceCameraAuthorization();
-      }
-    });
+  async componentDidMount(){
+    const isCameraAuthorized = await CameraKitCamera.checkDeviceCameraAuthorizationStatus();
+    const isUserAuthorizedCamera = await CameraKitCamera.requestDeviceCameraAuthorization();
+    if(!isCameraAuthorized || isCameraAuthorized === -1){
+      CameraKitCamera.requestDeviceCameraAuthorization();
+    }
+    // CameraKitCameraScreen.checkDeviceCameraAuthorizationStatus().then(isCameraAuthorized => {
+    //   if (!isCameraAuthorized || isCameraAuthorized === -1) {
+    //        CameraKitCamera.requestDeviceCameraAuthorization();
+    //   }
+    // });
     this.props.navigation.addListener('willFocus', (playload)=>{
       //alert(12);
       this.setState({
