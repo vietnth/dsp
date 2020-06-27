@@ -17,10 +17,12 @@ import User from './screens/User'
 import SQrCode from './screens/qrcode'
 import DetailQr from './screens/DetailQr'
 import Vantay from './screens/Vantay'
+import Thongbao from './screens/Thongbao'
+import Thongbaochitiet from './screens/Thongbaochitiet'
 
 import styles from './configs/style';
 
-
+import OneSignal from 'react-native-onesignal'; // Import package from node modules
 
 const HomeNavigator = createStackNavigator(
   {
@@ -34,8 +36,7 @@ const HomeNavigator = createStackNavigator(
     },
     Vattu: {
       screen: Vattu,
-  
-    navigationOptions: {
+      navigationOptions: {
         headerLeft: null,
         tabBarVisible: false
       ,
@@ -45,10 +46,10 @@ const HomeNavigator = createStackNavigator(
   
 
   }, {
-    defaultNavigationOptions:{
-      gesturesEnabled: false,
+      defaultNavigationOptions:{
+        gesturesEnabled: false,
+      }
     }
-  }
 
     ,{
       navigationOptions: {
@@ -67,6 +68,13 @@ const QrcodeStack = createStackNavigator(
   {
     Qrcode: SQrCode,
     DetailsQr: DetailQr
+  }
+);
+
+const NotificationStack = createStackNavigator(
+  {
+    Thongbao: Thongbao,
+    Thongbaochitiet: Thongbaochitiet
   }
 );
 
@@ -92,6 +100,17 @@ const TabNavigator = createBottomTabNavigator(
     },
     lazy:false
   },
+  Thongbao: {
+    screen: NotificationStack,
+    navigationOptions: {
+        title: "Thông báo",
+         tabBarIcon: ({ tintColor }) => (
+             <Icon name="bell" size={22} color={tintColor} />              
+         )
+    },
+    lazy:false
+  },
+
   Info: {
     screen: InfoStack,
     navigationOptions: {
@@ -152,6 +171,7 @@ HomeNavigator.navigationOptions = ({ navigation }) => {
 
 
 const AppContainer = createAppContainer(TabNavigator);
+OneSignal.init("ec4e5f22-8e76-444e-a9ba-ead394b25b40");
 
 export default class LoginView extends Component {
 
@@ -165,9 +185,11 @@ export default class LoginView extends Component {
       isLoggedIn1: false,
       messageshow:false
     }
-
+    
     
   }
+
+  
 
   
 

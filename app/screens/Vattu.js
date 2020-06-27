@@ -21,6 +21,8 @@ import styles from '../configs/style';
 
 import OneSignal from 'react-native-onesignal'; // Import package from node modules
 
+
+
 export default class Vattu extends Component {
 
     //Header ứng dụng (tùy chọn)
@@ -51,10 +53,48 @@ export default class Vattu extends Component {
         listData: []    //Khai báo listData để chứa dữ liệu
     }
     this.arrayholder = [];
-    OneSignal.init("ec4e5f22-8e76-444e-a9ba-ead394b25b40");
+    
+    this.onOpened = this.onOpened.bind(this);
+    this.onReceived = this.onReceived.bind(this);
+    this.onIds = this.onIds.bind(this);   
+
     
 }
 
+componentWillMount() { 
+    OneSignal.addEventListener('received', this.onReceived);
+    OneSignal.addEventListener('opened', this.onOpened);
+    OneSignal.addEventListener('ids', this.onIds);
+    // if (!IOS) {
+    //   OneSignal.inFocusDisplaying(0);
+    // }
+  }
+
+  componentWillUnmount() {
+    OneSignal.removeEventListener('received', this.onReceived);
+    OneSignal.removeEventListener('opened', this.onOpened);
+    OneSignal.removeEventListener('ids', this.onIds);
+    
+  }
+  
+  onReceived(notification) {
+    console.log("Notification received: ", notification);
+  }
+  
+  onOpened(openResult) {
+    console.log('Message: ', openResult.notification.payload.body);
+    console.log('Data: ', openResult.notification.payload.additionalData);
+    console.log('isActive: ', openResult.notification.isAppInFocus);
+    console.log('openResult: ', openResult);
+    let data = openResult.notification.payload.additionalData;
+    //alert(data)
+    this.props.navigation.navigate("Thongbao",data)
+    
+  }
+  
+  onIds(device) {
+    console.log('Device info: ', device);
+  }
 onRefresh() {
     this.setState({ isFetching: true }, function() { this.getLanguagesFromServer() });
  }
@@ -187,7 +227,7 @@ render() {
             <View style={styles.container}>
                 
                 <View style={{margin: 5,flexDirection: 'row',alignItems: 'center'}}>
-                    <TextInput placeholder='Tìm kiếm'  onChangeText={text => this.searchFilterFunction(text)}
+                    <TextInput placeholder='  Tìm kiếm'  onChangeText={text => this.searchFilterFunction(text)}
                      style={{width:'100%', height:40, padding:5, backgroundColor:'#FFF'}}></TextInput>
                 </View>
                 
@@ -212,6 +252,7 @@ renderItem(item, index) {
     return (
         <Tacphamitem
             data={item} //Truyền item này qua ViewItem như một prop
+            data1={index} //Truyền item này qua ViewItem như một prop
             onPressItem={(itemPress) => { this.onPressItem(itemPress) }}    // truyền một hàm qua để bắt sự kiện click item
         />
     )

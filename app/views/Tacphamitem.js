@@ -10,7 +10,7 @@ export class Tacphamitem extends React.Component {
     render() {
         //render ra màn hình item được truyền vào thông qua props
         return (
-            <View style={Styles.inputsContainer}>
+            <View style={this.props.data1%2===0?Styles.inputsContainer:Styles.inputsContainerold}>
             <TouchableOpacity style={Styles.fullwidth} onPress={() => this.props.onPressItem(this.props.data.ID)}>
                
             <Text style={Styles.textten}>{this.props.data.MA_VAT_TU + ' - ' + this.props.data.TEN_VAT_TU}</Text>
@@ -24,13 +24,20 @@ export class Tacphamitem extends React.Component {
 const Styles = StyleSheet.create({
     inputsContainer: {
         flex: 1,
-        width: '100%'
+        width: '100%',
+        backgroundColor:"#FFF"
+        
+    },
+    inputsContainerold: {
+        flex: 1,
+        width: '100%',
+        backgroundColor:"#cdf2e9"
     },
     fullwidth: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#FFF',
-        marginBottom: 1,
+        //backgroundColor: '#FFF',
+        marginBottom: 2,
         width: '100%'
 
     },
