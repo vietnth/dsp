@@ -16,7 +16,7 @@ export class Thongbaoitem extends React.Component {
         // }
      
         return (
-            <View style={this.props.data1%2===0?Styles.inputsContainer:Styles.inputsContainerold}>
+            <View style={this.props.data1%2===0?Styles.inputsContainerold:Styles.inputsContainer}>
                 
                 {/* <TouchableOpacity onPress={() => this.props.onPressItem(this.props.data.ID)}>
                 <View>
@@ -26,18 +26,25 @@ export class Thongbaoitem extends React.Component {
                 </View>
                 </TouchableOpacity> */}
                 <TouchableOpacity style={Styles.fullwidth} onPress={() => this.props.onPressItem(this.props.data.ID)}>
+                    
                     <View style={Styles.inputsContainer1}>
-                        <Image style={[{height:40, width:40, marginTop:5}, this.props.data.DA_XEM? Styles.hide:Styles.visible]} 
+                        
+                        <Text style={Styles.noidungthongbao}>
+                            {this.props.data.TIEU_DE}
+                            
+                        </Text> 
+                             
+                    </View>
+
+                    <View style={Styles.inputsContainer1}>
+                        <Image style={[{height:30, width:30, marginTop:5, marginLeft:5}, this.props.data.DA_XEM? Styles.hide:Styles.visible]} 
                             source={require('../images/new.png')}   />
                         <Text style={Styles.tieudethongbao}>
                             {this.props.data.NGAY_THONG_BAO + ' - ' + this.props.data.NGUOI_GUI}
                         </Text>
                              
                     </View>
-                    <Text style={Styles.noidungthongbao}>
-                            {this.props.data.TIEU_DE}
-                            
-                        </Text>            
+                               
                 </TouchableOpacity>
              
                 {/* <View>

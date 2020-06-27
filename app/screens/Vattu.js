@@ -159,8 +159,19 @@ searchFilterFunction = text => {
     this.setState({ listData: newData });  
   };
 
-  
-componentDidMount() {
+  componentDidMount() {
+    //alert(this.state.token+ "123");
+    var abc=this;
+    this.props.navigation.addListener(
+      'didFocus',
+      payload => {
+        //abc.setState({email: Math.random()});
+        abc.getdata();
+      }
+    );
+  }
+
+  getdata() {
     //alert(this.state.token+ "123");
     const {navigation}=this.props;
 

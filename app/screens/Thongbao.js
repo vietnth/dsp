@@ -18,19 +18,19 @@ import {Thongbaoitem} from '../views/Thongbaoitem';
 import {Tacphamitem} from '../views/Tacphamitem';
 import config from "../configs/config"
 import styles from '../configs/style';
-
+import OneSignal from 'react-native-onesignal'; // Import package from node modules
 export default class Thongbao extends Component {
 
-    //Header ứng dụng (tùy chọn)
-    static navigationOptions = ({ navigation }) => {
-        return {
-            title: "Thông báo",
-            headerTitleStyle: {
-                alignSelf: 'center',
-                headerLeft: null
-            }
-        };
-    };
+  //Header ứng dụng (tùy chọn)
+  static navigationOptions = ({ navigation }) => {
+      return {
+          title: "Thông báo",
+          headerTitleStyle: {
+              alignSelf: 'center',
+              headerLeft: null
+          }
+      };
+  };
 
   constructor(props) {
     super(props);
@@ -49,7 +49,7 @@ export default class Thongbao extends Component {
         listData: []    //Khai báo listData để chứa dữ liệu
     }
     this.arrayholder = [];
-                    
+    this.onReceived = this.onReceived.bind(this);
 }
 
 onRefresh() {
@@ -106,7 +106,7 @@ onPressItem(item) {
 
 searchFilterFunction = text => {    
     const newData = this.arrayholder.filter(item => {      
-      const itemData = item.TEN_VAT_TU.toUpperCase() + ' ' + item.MA_VAT_TU.toUpperCase();
+      const itemData = item.TIEU_DE.toUpperCase() + ' ' + item.NOI_DUNG.toUpperCase();
       
        const textData = text.toUpperCase();
        //alert(itemData);
@@ -126,8 +126,17 @@ searchFilterFunction = text => {
         abc.getdata();
       }
     );
-  
-    }
+    OneSignal.addEventListener('received', this.onReceived);
+  }
+
+  onReceived(notification) {
+    //alert(notification);
+    var abc=this;
+    //abc.getdata();
+    this.getLanguagesFromServer();
+    //abc.setState({isFetching: true})
+  }
+
   
 getdata() {
     //alert(this.state.token+ "123");
