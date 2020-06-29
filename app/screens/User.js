@@ -13,6 +13,7 @@ import {
   SafeAreaView
 } from 'react-native';
 import { NavigationActions, StackActions } from 'react-navigation';
+import OneSignal from 'react-native-onesignal'; // Import package from node modules
 
 import styles from '../configs/style';
 
@@ -62,6 +63,7 @@ export default class User extends Component {
             AsyncStorage.setItem("hoten", '');
             this.setState({hoten: ''});
             this.setState({message: 'none'});
+            OneSignal.setSubscription(false);
             // this.props.navigation.dispatch(
             //   NavigationActions.reset({
             //     index:0,

@@ -124,6 +124,7 @@ searchFilterFunction = text => {
       payload => {
         //abc.setState({email: Math.random()});
         abc.getdata();
+        
       }
     );
     OneSignal.addEventListener('received', this.onReceived);
@@ -133,6 +134,7 @@ searchFilterFunction = text => {
     //alert(notification);
     var abc=this;
     //abc.getdata();
+    //this.props.handler();
     this.getLanguagesFromServer();
     //abc.setState({isFetching: true})
   }

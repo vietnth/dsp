@@ -13,8 +13,6 @@ import {
   SafeAreaView
 } from 'react-native';
 
-import { SearchBar} from 'react-native-elements'
-
 import {Tacphamitem} from '../views/Tacphamitem';
 import config from "../configs/config"
 import styles from '../configs/style';
@@ -39,7 +37,7 @@ export default class Vattu extends Component {
   constructor(props) {
     super(props);
     //alert(this.props.token1);
-
+    //var bde=this;
     this.state = {
         isFetching: false,
         userid   : '',
@@ -50,19 +48,21 @@ export default class Vattu extends Component {
         display: "none",
         search:'',
         isLoading: true,
+        unreadMessagesCount:0,
         listData: []    //Khai báo listData để chứa dữ liệu
     }
     this.arrayholder = [];
     
     this.onOpened = this.onOpened.bind(this);
-    this.onReceived = this.onReceived.bind(this);
+    //this.onReceived = this.onReceived.bind(this);
     this.onIds = this.onIds.bind(this);   
+    //this.getlistthongbaochuadoc = this.getlistthongbaochuadoc.bind(this);   
 
     
 }
 
 componentWillMount() { 
-    OneSignal.addEventListener('received', this.onReceived);
+    //OneSignal.addEventListener('received', this.onReceived);
     OneSignal.addEventListener('opened', this.onOpened);
     OneSignal.addEventListener('ids', this.onIds);
     // if (!IOS) {
@@ -72,13 +72,16 @@ componentWillMount() {
 
   componentWillUnmount() {
     OneSignal.removeEventListener('received', this.onReceived);
-    OneSignal.removeEventListener('opened', this.onOpened);
+    //OneSignal.removeEventListener('opened', this.onOpened);
     OneSignal.removeEventListener('ids', this.onIds);
     
   }
   
   onReceived(notification) {
     console.log("Notification received: ", notification);
+    this.props.handler();
+    //this.getlistthongbaochuadoc();
+    //this.setState({unreadMessagesCount: unreadMessagesCount+1});
   }
   
   onOpened(openResult) {
@@ -103,6 +106,43 @@ updateSearch = search =>{
     this.setState({
         search
     });
+}
+
+getlistthongbaochuadoc() {
+        
+  return fetch(config.SERVER_URL + 'apimobile.aspx/getlistchuadoc',{
+  method: 'POST',
+  headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+      'TOKEN': this.state.token,
+  },
+  body: JSON.stringify({
+      pID: '1833',
+      qty: '13'
+  }),
+  })
+  .then((response) => response.json())
+  .then((responseJson) => {
+      //alert(JSON.stringify(responseJson.d));
+      //console.error(responseJson.d);
+      // this.arrayholder = JSON.parse(responseJson.d);      
+      this.setState({
+      listData: JSON.parse(responseJson.d)
+      }, function(){
+
+      });
+     
+      this.setState({unreadMessagesCount: this.state.listData[0]["COUNTER"]});
+      
+      alert(this.state.listData[0]["COUNTER"]);
+      alert(this.props.unreadMessagesCount);
+
+  })
+  .catch((error) =>{
+      console.error(error);
+  });
+  
 }
 
  getLanguagesFromServer() {
@@ -169,6 +209,7 @@ searchFilterFunction = text => {
         abc.getdata();
       }
     );
+    
   }
 
   getdata() {
@@ -195,7 +236,7 @@ searchFilterFunction = text => {
                 
                     }else{
                     this.getLanguagesFromServer();
-            
+                    //this.getlistthongbaochuadoc();
                     //console.log(result);
                     }
                 });
@@ -203,7 +244,7 @@ searchFilterFunction = text => {
                     this.setState({email: result});
                     OneSignal.setSubscription(true);
                     //alert(result.replace(/"/g,""));
-                    OneSignal.sendTag("tendangnhap", this.state.email.toString().toLowerCase().replace(/"/g,""));
+                    OneSignal.sendTag("tendangnhap", this.state.email.toString().replace(/"/g,""));
                     //alert(result+ "123");
                     //console.log(result);
                   });

@@ -20,9 +20,13 @@ import Vantay from './screens/Vantay'
 import Thongbao from './screens/Thongbao'
 import Thongbaochitiet from './screens/Thongbaochitiet'
 
-import styles from './configs/style';
 
 import OneSignal from 'react-native-onesignal'; // Import package from node modules
+
+import {  Avatar, Badge, withBadge , ListItem } from "react-native-elements";
+
+
+
 
 const HomeNavigator = createStackNavigator(
   {
@@ -78,6 +82,8 @@ const NotificationStack = createStackNavigator(
   }
 );
 
+
+//root navigator
 const TabNavigator = createBottomTabNavigator(
   {
     Home: {
@@ -86,7 +92,7 @@ const TabNavigator = createBottomTabNavigator(
           title: "Trang chủ",
           tabBarIcon: ({ tintColor }) => (
                <Icon name="home" size={22} color={tintColor} />              
-           )
+           ),
       }
   },
     
@@ -96,18 +102,28 @@ const TabNavigator = createBottomTabNavigator(
         title: "QrCode",
          tabBarIcon: ({ tintColor }) => (
              <Icon name="qrcode" size={22} color={tintColor} />              
+             
          )
     },
     lazy:false
   },
   Thongbao: {
     screen: NotificationStack,
-    navigationOptions: {
+    navigationOptions:({ screenProps }) => ({
         title: "Thông báo",
          tabBarIcon: ({ tintColor }) => (
-             <Icon name="bell" size={22} color={tintColor} />              
+          <View>
+          <Icon name="bell" size={22} color={tintColor} />  
+        
+          <Badge
+            status="success"
+            value={screenProps.unreadMessagesCount}
+            containerStyle={{ position: 'absolute', top: -4, right: -4 }}
+          />
+        </View>
+                                      
          )
-    },
+    }),
     lazy:false
   },
 
@@ -122,6 +138,8 @@ const TabNavigator = createBottomTabNavigator(
   }
     }
 );
+
+//end root navigator
 
 HomeNavigator.navigationOptions = ({ navigation }) => {
   const currentRoute = navigation.state.routes[navigation.state.index];
@@ -183,26 +201,114 @@ export default class LoginView extends Component {
       token: '',
       hoten: '',
       isLoggedIn1: false,
-      messageshow:false
+      messageshow:false,
+      unreadMessagesCount:0,
+      listData: [] 
     }
+    
+    this.onReceived = this.onReceived.bind(this);
+    this.handler = this.handler.bind(this)
+  }
+
+  handler() {
+    // this.setState({
+    //   someVar: 'some value'
+    // })
+    this.getlistthongbaochuadoc();
+  }
+
+  onReceived(notification) {
+    //console.log("Notification received: ", notification);
+    //alert(notification + " hello");
+    this.getlistthongbaochuadoc();
+    //this.setState({unreadMessagesCount: this.state.unreadMessagesCount+1});
+  }
+  
+
+  componentWillMount() { 
+    OneSignal.addEventListener('received', this.onReceived);
+    // OneSignal.addEventListener('opened', this.onOpened);
+    // OneSignal.addEventListener('ids', this.onIds);
+    // if (!IOS) {
+    //   OneSignal.inFocusDisplaying(0);
+    // }
+  }
+
+   componentWillUnmount() {
+    OneSignal.removeEventListener('received', this.onReceived);
+    // OneSignal.removeEventListener('opened', this.onOpened);
+    // OneSignal.removeEventListener('ids', this.onIds);
+    
+  }
+
+  getlistthongbaochuadoc() {
+        
+    return fetch('https://toanha.dsp.vn/apimobile.aspx/getlistchuadoc',{
+    method: 'POST',
+    headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+        'TOKEN': this.state.token,
+    },
+    body: JSON.stringify({
+        pID: '1833',
+        qty: '13'
+    }),
+    })
+    .then((response) => response.json())
+    .then((responseJson) => {
+        //alert(JSON.stringify(responseJson));
+        //alert(123);
+        //console.error(responseJson.d);
+        // this.arrayholder = JSON.parse(responseJson.d);      
+        this.setState({
+        listData: JSON.parse(responseJson.d)
+        }, function(){
+  
+        });
+       
+        this.setState({unreadMessagesCount: this.state.listData[0]["COUNTER"]});
+        
+        //alert(this.state.listData[0]["COUNTER"]);
+        //alert(this.props.unreadMessagesCount);
+  
+    })
+    .catch((error) =>{
+        console.error(error);
+    });
+    
+  }
+
+
+  componentDidMount() {
+    //alert(this.state.token+ "123");
+    this.setdate();
     
     
   }
 
-  
-
-  
-
-  componentDidMount() {
+ setdate() {
     //AsyncStorage.getItem("isLoggedIn").then((value) =>{
     //  this.setState({"isLoggedIn": value});
     //}).done();
-   try{
+    //OneSignal.addEventListener('received', this.onReceived);
+    
+    try{
+      AsyncStorage.getItem("token").then(result =>{
+        //alert(result+ "123");
+        this.setState({isLoggedIn1: result, display: "flex"});
+
+        this.setState({token: result});
+        this.getlistthongbaochuadoc();
+    });
       AsyncStorage.getItem("isLoggedIn1").then(async (result) =>{
         //AsyncStorage.setItem("isLoggedIn1", false);
         this.setState({isLoggedIn1: result});
+        //this.setState({unreadMessagesCount: 14});
+        //this.onLoadCats().then((cats) => this.setState({ cats: cats }));
         //alert(result+ "123");
         //console.log(result);
+       
       });
       AsyncStorage.getItem("hoten").then(async (result) =>{
         this.setState({hoten: result});
@@ -224,13 +330,14 @@ export default class LoginView extends Component {
       this.setState({token: ''});
       this.setState({hoten: ''});
     }
-    
-    }
+    //await this.getlistthongbaochuadoc();  
+  }
 
     
   render() {
     return (
-      <AppContainer />
+      
+      <AppContainer screenProps={{ unreadMessagesCount: this.state.unreadMessagesCount }}  />
       );
   }
     //alert(this.state.isLoggedIn1);
