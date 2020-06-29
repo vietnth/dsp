@@ -203,7 +203,7 @@ searchFilterFunction = text => {
                     this.setState({email: result});
                     OneSignal.setSubscription(true);
                     //alert(result.replace(/"/g,""));
-                    OneSignal.sendTag("tendangnhap", this.state.email.toString().replace(/"/g,""));
+                    OneSignal.sendTag("tendangnhap", this.state.email.toString().toLowerCase().replace(/"/g,""));
                     //alert(result+ "123");
                     //console.log(result);
                   });

@@ -29,20 +29,25 @@ export class Thongbaoitem extends React.Component {
                     
                     <View style={Styles.inputsContainer1}>
                         
-                        <Text style={Styles.noidungthongbao}>
-                            {this.props.data.TIEU_DE}
-                            
-                        </Text> 
+                        <Image style={[{height:30, width:30, marginTop:5, marginLeft:5}, this.props.data.DA_XEM? Styles.hide:Styles.visible]} 
+                            source={require('../images/new.png')}   />
+
+                        <View style={Styles.inputsContainer1}>
+                            <Text style={Styles.noidungthongbao}>
+                                {this.props.data.TIEU_DE}
+                                
+                            </Text> 
+                        </View>     
+
                              
                     </View>
 
-                    <View style={Styles.inputsContainer1}>
-                        <Image style={[{height:30, width:30, marginTop:5, marginLeft:5}, this.props.data.DA_XEM? Styles.hide:Styles.visible]} 
-                            source={require('../images/new.png')}   />
-                        <Text style={Styles.tieudethongbao}>
-                            {this.props.data.NGAY_THONG_BAO + ' - ' + this.props.data.NGUOI_GUI}
-                        </Text>
-                             
+                    <View style={[Styles.inputsContainer1]}>
+                        
+                            <Text style={Styles.tieudethongbao}>
+                                {this.props.data.NGAY_THONG_BAO + ' - ' + this.props.data.NGUOI_GUI}
+                            </Text>
+                       
                     </View>
                                
                 </TouchableOpacity>
@@ -114,16 +119,16 @@ const Styles = StyleSheet.create({
     tieudethongbao: {
         fontSize: 16,
         fontWeight: 'normal',
-        color: '#000',
+        color: '#5d5d60',
         padding: 10,        
         width: '100%',
         flexWrap: 'wrap',
-        fontStyle:"italic",
+        fontStyle:"italic"
         
     },
     noidungthongbao: {
         fontSize: 16,
-        fontWeight: 'normal',
+        fontWeight: '600',
         color: '#000',
         padding: 10,        
         width: '100%',
