@@ -19,6 +19,8 @@ import {Tacphamitem} from '../views/Tacphamitem';
 import config from "../configs/config"
 import styles from '../configs/style';
 import OneSignal from 'react-native-onesignal'; // Import package from node modules
+import '../Context/global'
+
 export default class Thongbao extends Component {
 
   //Header ứng dụng (tùy chọn)
@@ -46,14 +48,16 @@ export default class Thongbao extends Component {
         display: "none",
         search:'',
         isLoading: true,
-        listData: []    //Khai báo listData để chứa dữ liệu
+        listData: [],    //Khai báo listData để chứa dữ liệu
+        listData1: [],    //Khai báo listData để chứa dữ liệu
+        pagenum:1
     }
     this.arrayholder = [];
     this.onReceived = this.onReceived.bind(this);
 }
 
 onRefresh() {
-    this.setState({ isFetching: true }, function() { this.getLanguagesFromServer() });
+    this.setState({ isFetching: true }, function() { this.getLanguagesFromServer(1) });
  }
 
 updateSearch = search =>{
@@ -62,9 +66,9 @@ updateSearch = search =>{
     });
 }
 
- getLanguagesFromServer() {
+getlistthongbaochuadoc() {
         
-    return fetch(config.SERVER_URL + 'apimobile.aspx/getlistthongbao',{
+    return fetch(config.SERVER_URL + 'apimobile.aspx/getlistchuadoc',{
     method: 'POST',
     headers: {
         Accept: 'application/json',
@@ -80,15 +84,73 @@ updateSearch = search =>{
     .then((responseJson) => {
         //alert(JSON.stringify(responseJson.d));
         //console.error(responseJson.d);
-        this.arrayholder = JSON.parse(responseJson.d);      
+        // this.arrayholder = JSON.parse(responseJson.d);      
         this.setState({
-        isLoading: false,
-        isFetching: false,
-        message: JSON.stringify(responseJson.d),
-        listData: JSON.parse(responseJson.d)
+        listData1: JSON.parse(responseJson.d)
         }, function(){
-
+  
         });
+        global.unreadMessagesCount=this.state.listData1[0]["COUNTER"];
+        //this.setState({unreadMessagesCount: this.state.listData1[0]["COUNTER"]});
+        
+        //alert(this.state.listData[0]["COUNTER"]);
+        //alert(this.props.unreadMessagesCount);
+  
+    })
+    .catch((error) =>{
+        console.error(error);
+    });
+    
+  }
+
+ getLanguagesFromServer(_pagenum) {
+        
+    return fetch(config.SERVER_URL + 'apimobile.aspx/getlistthongbao?numpage=' + _pagenum,{
+    method: 'POST',
+    headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+        'TOKEN': this.state.token,
+    },
+    body: JSON.stringify({
+        pID: '1833',
+        qty: '13'
+    }),
+    })
+    .then((response) => response.json())
+    .then((responseJson) => {
+        //alert(JSON.stringify(responseJson.d));
+        //console.error(responseJson.d);
+        this.arrayholder = JSON.parse(responseJson.d);    
+        // this.setState({
+        //     isLoading: false,
+        //     isFetching: false,
+        //     message: JSON.stringify(responseJson.d),
+        //     listData: JSON.parse(responseJson.d)
+        // }, function(){
+
+        // });
+
+        if(this.state.pagenum>1)  {
+            this.setState({
+                isLoading: false,
+                isFetching: false,
+                message: JSON.stringify(responseJson.d),
+                listData: this.state.listData.concat(JSON.parse(responseJson.d))
+            }, function(){
+    
+            });
+        }else{
+            this.setState({
+                isLoading: false,
+                isFetching: false,
+                message: JSON.stringify(responseJson.d),
+                listData: JSON.parse(responseJson.d)
+            }, function(){
+    
+            });
+        }
+        
 
     })
     .catch((error) =>{
@@ -96,6 +158,27 @@ updateSearch = search =>{
     });
     
 }
+
+
+_ItemLoadMore(){
+    //alert(this.state.pagenum);
+    this.setState({pagenum: this.state.pagenum + 1});
+    //alert(this.state.pagenum);
+    this.getLanguagesFromServer(this.state.pagenum + 1);
+    // if (this.state.current_page +1 <= this.state.total_pages)
+    // {
+    //     if (this.keyword  && this.keyword !='')
+    //     {
+    //         var page = this.state.current_page+1;
+    //         this.search(this.keyword, page)
+    //     }
+    //     else
+    //     {
+    //         this.loadMore(this.state.current_page+1)
+    //     }
+    // }
+}
+
 
 // onPress Item Language
 onPressItem(item) {
@@ -116,6 +199,14 @@ searchFilterFunction = text => {
     this.setState({ listData: newData });  
   };
 
+  componentWillMount() { 
+    OneSignal.addEventListener('received', this.onReceived);
+    
+    // if (!IOS) {
+    //   OneSignal.inFocusDisplaying(0);
+    // }
+  }
+
   componentDidMount() {
     //alert(this.state.token+ "123");
     var abc=this;
@@ -127,7 +218,7 @@ searchFilterFunction = text => {
         
       }
     );
-    OneSignal.addEventListener('received', this.onReceived);
+    //OneSignal.addEventListener('received', this.onReceived);
   }
 
   onReceived(notification) {
@@ -135,7 +226,13 @@ searchFilterFunction = text => {
     var abc=this;
     //abc.getdata();
     //this.props.handler();
-    this.getLanguagesFromServer();
+    //global.unreadMessagesCount=15;
+    //alert(global.unreadMessagesCount);
+    
+    this.getLanguagesFromServer(1);
+    this.getlistthongbaochuadoc();
+    
+    //this.props.navigation.state.unreadMessagesCount=13;
     //abc.setState({isFetching: true})
   }
 
@@ -162,8 +259,8 @@ getdata() {
                         this.props.navigation.navigate("Login")
                 
                     }else{
-                    this.getLanguagesFromServer();
-            
+                    this.getLanguagesFromServer(1);
+                    
                     //console.log(result);
                     }
                 });
@@ -209,6 +306,10 @@ render() {
                     refreshing={this.state.isFetching}
                     renderItem={({ item, index }) => this.renderItem(item, index)}
                     keyExtractor={(item, index) => index.toString()}
+                    onEndReachedThreshold={0.5}
+                    onEndReached={({ distanceFromEnd }) => {
+                        this._ItemLoadMore();
+                        }}
                 />
 
             </View>

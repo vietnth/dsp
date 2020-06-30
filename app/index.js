@@ -19,6 +19,7 @@ import DetailQr from './screens/DetailQr'
 import Vantay from './screens/Vantay'
 import Thongbao from './screens/Thongbao'
 import Thongbaochitiet from './screens/Thongbaochitiet'
+import './Context/global'
 
 
 import OneSignal from 'react-native-onesignal'; // Import package from node modules
@@ -117,7 +118,7 @@ const TabNavigator = createBottomTabNavigator(
         
           <Badge
             status="success"
-            value={screenProps.unreadMessagesCount}
+            value={global.unreadMessagesCount}
             containerStyle={{ position: 'absolute', top: -4, right: -4 }}
           />
         </View>
@@ -266,8 +267,9 @@ export default class LoginView extends Component {
         }, function(){
   
         });
-       
-        this.setState({unreadMessagesCount: this.state.listData[0]["COUNTER"]});
+        global.unreadMessagesCount=this.state.listData[0]["COUNTER"];
+        //alert(global.unreadMessagesCount);
+        this.setState({unreadMessagesCount: global.unreadMessagesCount});
         
         //alert(this.state.listData[0]["COUNTER"]);
         //alert(this.props.unreadMessagesCount);
@@ -292,18 +294,26 @@ export default class LoginView extends Component {
     //  this.setState({"isLoggedIn": value});
     //}).done();
     //OneSignal.addEventListener('received', this.onReceived);
-    
+    const self=this;
     try{
       AsyncStorage.getItem("token").then(result =>{
         //alert(result+ "123");
-        this.setState({isLoggedIn1: result, display: "flex"});
+        //this.setState({isLoggedIn1: true, display: "flex"});
 
-        this.setState({token: result});
-        this.getlistthongbaochuadoc();
+        self.setState({token: result});
+        
+        
     });
       AsyncStorage.getItem("isLoggedIn1").then(async (result) =>{
         //AsyncStorage.setItem("isLoggedIn1", false);
-        this.setState({isLoggedIn1: result});
+        
+        self.setState({isLoggedIn1: result});
+        //var islogin =result
+        //alert(islogin)
+        if (self.state.isLoggedIn1=='true'){
+          //alert(self.state.isLoggedIn1)
+          self.getlistthongbaochuadoc();
+        }
         //this.setState({unreadMessagesCount: 14});
         //this.onLoadCats().then((cats) => this.setState({ cats: cats }));
         //alert(result+ "123");
@@ -311,12 +321,12 @@ export default class LoginView extends Component {
        
       });
       AsyncStorage.getItem("hoten").then(async (result) =>{
-        this.setState({hoten: result});
+        self.setState({hoten: result});
         //alert(result+ "123");
         //console.log(result);
       });
       AsyncStorage.getItem("user_name").then(async (result) =>{
-        this.setState({user_name: result});
+        self.setState({user_name: result});
         
         //alert(result+ "123");
         //console.log(result);
@@ -325,10 +335,11 @@ export default class LoginView extends Component {
       
     } catch(error){ 
       AsyncStorage.setItem("isLoggedIn1", false);
-      this.setState({isLoggedIn1: false});
-      this.setState({userid: ''});
-      this.setState({token: ''});
-      this.setState({hoten: ''});
+      AsyncStorage.setItem("token", '');
+      self.setState({isLoggedIn1: false});
+      self.setState({userid: ''});
+      self.setState({token: ''});
+      self.setState({hoten: ''});
     }
     //await this.getlistthongbaochuadoc();  
   }
@@ -337,7 +348,7 @@ export default class LoginView extends Component {
   render() {
     return (
       
-      <AppContainer screenProps={{ unreadMessagesCount: this.state.unreadMessagesCount }}  />
+      <AppContainer screenProps={{ unreadMessagesCount: global.unreadMessagesCount }}  />
       );
   }
     //alert(this.state.isLoggedIn1);

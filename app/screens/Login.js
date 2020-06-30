@@ -52,14 +52,8 @@ export default class Login extends Component {
         isLoggedIn1: false,
         isLoading: true,
         userinfo: []    //Khai báo listData để chứa dữ liệu
-    }
-
-    
-    
-    
+    }    
 }
-
-
 
     loginevent(){
       //getuserFromServer("url",this.state.email,this.state.password,"3KrZlj82pcH62exCLFP1sxJCbEZPGdc0");
@@ -88,7 +82,7 @@ export default class Login extends Component {
            AsyncStorage.setItem("isLoggedIn1", "true");
            
            OneSignal.setSubscription(true);
-           OneSignal.sendTag("tendangnhap", this.state.email);
+           OneSignal.sendTag("tendangnhap", this.state.email.toLowerCase());
            
            this.setState({
             //userinfo: JSON.parse(responseJson.user),

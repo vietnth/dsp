@@ -15,6 +15,8 @@ import {
 
 import config from "../configs/config"
 
+import "../Context/global"
+
 import {Thongbaochitietitem} from '../views/Thongbaochitietitem';
 
 
@@ -129,11 +131,12 @@ componentDidMount() {
         const itemid = navigation.getParam('itemid','0')
     //alert(itemid)
         this.getLanguagesFromServer(itemid);
+        global.unreadMessagesCount=(parseInt(global.unreadMessagesCount)-1);
         //this.getLichsuFromServer(itemid);
 
         //console.log(result);
       });
-    }
+}
 
     
 render() {

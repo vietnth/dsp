@@ -27,11 +27,14 @@ export default class SQrCode extends Component {
   }
 
   async componentDidMount(){
-    const isCameraAuthorized = await CameraKitCamera.checkDeviceCameraAuthorizationStatus();
-    const isUserAuthorizedCamera = await CameraKitCamera.requestDeviceCameraAuthorization();
-    if(!isCameraAuthorized || isCameraAuthorized === -1){
-      CameraKitCamera.requestDeviceCameraAuthorization();
-    }
+
+    this.onOpneScanner();
+    // const isCameraAuthorized = await CameraKitCamera.checkDeviceCameraAuthorizationStatus();
+    // const isUserAuthorizedCamera = await CameraKitCamera.requestDeviceCameraAuthorization();
+    // if(!isCameraAuthorized || isCameraAuthorized === -1){
+    //   CameraKitCamera.requestDeviceCameraAuthorization();
+    // }
+    
     // CameraKitCameraScreen.checkDeviceCameraAuthorizationStatus().then(isCameraAuthorized => {
     //   if (!isCameraAuthorized || isCameraAuthorized === -1) {
     //        CameraKitCamera.requestDeviceCameraAuthorization();
