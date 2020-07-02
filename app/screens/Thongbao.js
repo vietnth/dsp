@@ -57,7 +57,10 @@ export default class Thongbao extends Component {
 }
 
 onRefresh() {
+    
     this.setState({ isFetching: true }, function() { this.getLanguagesFromServer(1) });
+    this.getlistthongbaochuadoc();
+    
  }
 
 updateSearch = search =>{
@@ -121,7 +124,7 @@ getlistthongbaochuadoc() {
     .then((responseJson) => {
         //alert(JSON.stringify(responseJson.d));
         //console.error(responseJson.d);
-        this.arrayholder = JSON.parse(responseJson.d);    
+       
         // this.setState({
         //     isLoading: false,
         //     isFetching: false,
@@ -130,26 +133,34 @@ getlistthongbaochuadoc() {
         // }, function(){
 
         // });
-
-        if(this.state.pagenum>1)  {
-            this.setState({
-                isLoading: false,
-                isFetching: false,
-                message: JSON.stringify(responseJson.d),
-                listData: this.state.listData.concat(JSON.parse(responseJson.d))
-            }, function(){
+        //alert(_pagenum);
+        let _arr =JSON.parse(responseJson.d);
+        if (Array.isArray(_arr) ){
+            if(_pagenum>1)  {
+                this.setState({
+                    isLoading: false,
+                    isFetching: false,
+                    message: JSON.stringify(responseJson.d),
+                    listData: this.state.listData.concat(JSON.parse(responseJson.d)),
+                    pagenum: this.state.pagenum + 1
+                }, function(){
+        
+                });
+            }else{
+                this.setState({
+                    isLoading: false,
+                    isFetching: false,
+                    message: JSON.stringify(responseJson.d),
+                    listData: JSON.parse(responseJson.d),
+                    pagenum: 2
+                }, function(){
+        
+                });
+            }
     
-            });
-        }else{
-            this.setState({
-                isLoading: false,
-                isFetching: false,
-                message: JSON.stringify(responseJson.d),
-                listData: JSON.parse(responseJson.d)
-            }, function(){
-    
-            });
         }
+        
+        this.arrayholder = this.state.listData;    
         
 
     })
@@ -162,7 +173,7 @@ getlistthongbaochuadoc() {
 
 _ItemLoadMore(){
     //alert(this.state.pagenum);
-    this.setState({pagenum: this.state.pagenum + 1});
+    //this.setState({pagenum: this.state.pagenum + 1});
     //alert(this.state.pagenum);
     this.getLanguagesFromServer(this.state.pagenum + 1);
     // if (this.state.current_page +1 <= this.state.total_pages)

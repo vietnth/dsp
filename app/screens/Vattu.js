@@ -18,7 +18,7 @@ import config from "../configs/config"
 import styles from '../configs/style';
 
 import OneSignal from 'react-native-onesignal'; // Import package from node modules
-
+import '../Context/global'
 
 
 export default class Vattu extends Component {
@@ -49,7 +49,9 @@ export default class Vattu extends Component {
         search:'',
         isLoading: true,
         unreadMessagesCount:0,
-        listData: []    //Khai báo listData để chứa dữ liệu
+        listData: [],    //Khai báo listData để chứa dữ liệu
+        listData1: [],    //Khai báo listData để chứa dữ liệu
+        pagenum:1
     }
     this.arrayholder = [];
     
@@ -98,56 +100,20 @@ componentWillMount() {
   onIds(device) {
     console.log('Device info: ', device);
   }
-onRefresh() {
-    this.setState({ isFetching: true }, function() { this.getLanguagesFromServer() });
- }
 
-updateSearch = search =>{
-    this.setState({
-        search
-    });
-}
+  onRefresh() {
+      this.setState({ isFetching: true }, function() { this.getLanguagesFromServer() });
+  }
 
-getlistthongbaochuadoc() {
-        
-  return fetch(config.SERVER_URL + 'apimobile.aspx/getlistchuadoc',{
-  method: 'POST',
-  headers: {
-      Accept: 'application/json',
-      'Content-Type': 'application/json',
-      'TOKEN': this.state.token,
-  },
-  body: JSON.stringify({
-      pID: '1833',
-      qty: '13'
-  }),
-  })
-  .then((response) => response.json())
-  .then((responseJson) => {
-      //alert(JSON.stringify(responseJson.d));
-      //console.error(responseJson.d);
-      // this.arrayholder = JSON.parse(responseJson.d);      
+  updateSearch = search =>{
       this.setState({
-      listData: JSON.parse(responseJson.d)
-      }, function(){
-
+          search
       });
-     
-      this.setState({unreadMessagesCount: this.state.listData[0]["COUNTER"]});
-      
-      alert(this.state.listData[0]["COUNTER"]);
-      alert(this.props.unreadMessagesCount);
+  }
 
-  })
-  .catch((error) =>{
-      console.error(error);
-  });
-  
-}
-
- getLanguagesFromServer() {
-        
-    return fetch(config.SERVER_URL + 'apimobile.aspx/getlistvattu',{
+  getlistthongbaochuadoc() {
+          
+    return fetch(config.SERVER_URL + 'apimobile.aspx/getlistchuadoc',{
     method: 'POST',
     headers: {
         Accept: 'application/json',
@@ -163,41 +129,81 @@ getlistthongbaochuadoc() {
     .then((responseJson) => {
         //alert(JSON.stringify(responseJson.d));
         //console.error(responseJson.d);
-        this.arrayholder = JSON.parse(responseJson.d);      
-        this.setState({
-        isLoading: false,
-        isFetching: false,
-        message: JSON.stringify(responseJson.d),
-        listData: JSON.parse(responseJson.d)
-        }, function(){
-
-        });
+        // this.arrayholder = JSON.parse(responseJson.d);      
+        if (Array.isArray(JSON.parse(responseJson.d)) ){
+          this.setState({
+            listData1: JSON.parse(responseJson.d)
+            }, function(){
+    
+            });
+            global.unreadMessagesCount=JSON.parse(responseJson.d)[0]["COUNTER"];
+        }
+        
+        //this.setState({unreadMessagesCount: this.state.listData1[0]["COUNTER"]});
+        
+        //alert(this.state.listData[0]["COUNTER"]);
+        //alert(this.props.unreadMessagesCount);
 
     })
     .catch((error) =>{
         console.error(error);
     });
     
-}
+  }
 
-// onPress Item Language
-onPressItem(item) {
-    //alert("Click Item language: " +  item)
-    //AppContainer.navigation.navigate("Details",{itemid:item})
-    this.props.navigation.navigate("Details",{itemid:item})
-}
+  getLanguagesFromServer() {
+          
+      return fetch(config.SERVER_URL + 'apimobile.aspx/getlistvattu',{
+      method: 'POST',
+      headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+          'TOKEN': this.state.token,
+      },
+      body: JSON.stringify({
+          pID: '1833',
+          qty: '13'
+      }),
+      })
+      .then((response) => response.json())
+      .then((responseJson) => {
+          //alert(JSON.stringify(responseJson.d));
+          //console.error(responseJson.d);
+          this.arrayholder = JSON.parse(responseJson.d);      
+          this.setState({
+          isLoading: false,
+          isFetching: false,
+          message: JSON.stringify(responseJson.d),
+          listData: JSON.parse(responseJson.d)
+          }, function(){
 
-searchFilterFunction = text => {    
-    const newData = this.arrayholder.filter(item => {      
-      const itemData = item.TEN_VAT_TU.toUpperCase() + ' ' + item.MA_VAT_TU.toUpperCase();
+          });
+
+      })
+      .catch((error) =>{
+          console.error(error);
+      });
       
-       const textData = text.toUpperCase();
-       //alert(itemData);
-       return itemData.indexOf(textData) > -1;    
-    });
-    
-    this.setState({ listData: newData });  
-  };
+  }
+
+  // onPress Item Language
+  onPressItem(item) {
+      //alert("Click Item language: " +  item)
+      //AppContainer.navigation.navigate("Details",{itemid:item})
+      this.props.navigation.navigate("Details",{itemid:item})
+  }
+
+  searchFilterFunction = text => {    
+      const newData = this.arrayholder.filter(item => {      
+        const itemData = item.TEN_VAT_TU.toUpperCase() + ' ' + item.MA_VAT_TU.toUpperCase();
+        
+        const textData = text.toUpperCase();
+        //alert(itemData);
+        return itemData.indexOf(textData) > -1;    
+      });
+      
+      this.setState({ listData: newData });  
+    };
 
   componentDidMount() {
     //alert(this.state.token+ "123");
@@ -236,6 +242,7 @@ searchFilterFunction = text => {
                 
                     }else{
                     this.getLanguagesFromServer();
+                    this.getlistthongbaochuadoc();
                     //this.getlistthongbaochuadoc();
                     //console.log(result);
                     }
