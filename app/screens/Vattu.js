@@ -251,7 +251,7 @@ componentWillMount() {
                     this.setState({email: result});
                     OneSignal.setSubscription(true);
                     //alert(result.replace(/"/g,""));
-                    OneSignal.sendTag("tendangnhap", this.state.email.toString().toLocaleUpperCase().replace(/"/g,""));
+                    OneSignal.sendTag("tendangnhap", this.state.email.toString().toLocaleLowerCase().replace(/"/g,""));
                     //alert(result+ "123");
                     //console.log(result);
                   });
